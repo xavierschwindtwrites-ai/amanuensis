@@ -3,7 +3,7 @@
  * The window never touches the disk or an API key; it talks to this file through preload.js.
  */
 'use strict';
-const { app, BrowserWindow, Menu, ipcMain, dialog, shell, safeStorage, session, systemPreferences, powerSaveBlocker } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog, shell, safeStorage, session, systemPreferences, powerSaveBlocker, nativeImage } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -98,6 +98,7 @@ function buildMenu() {
         { label: 'Manuscript (.pdf)…', click: menuCmd('export', { format: 'pdf' }) },
         { label: 'Markdown (.md)…', click: menuCmd('export', { format: 'md' }) },
         { label: 'Plain Text (.txt)…', click: menuCmd('export', { format: 'txt' }) },
+        { label: 'Book Cover (.png)…', click: menuCmd('exportCover') },
         { type: 'separator' },
         { label: 'Raw Dictation Transcript (.txt)…', click: menuCmd('export', { format: 'transcript' }) },
       ] },
@@ -348,6 +349,23 @@ function registerIpc() {
     saveSettings();
     L.setRoot(settings.libraryPath);
     return settings.libraryPath;
+  });
+
+  handle('cover:export', async ({ bookId, png }) => {
+    const book = L.openBook(bookId);
+    if (typeof png !== 'string' || !png.startsWith('data:image/png;base64,') || png.length > 80 * 1024 * 1024) throw new Error('Invalid cover image.');
+    const image = nativeImage.createFromDataURL(png);
+    const size = image.getSize();
+    if (image.isEmpty() || size.width !== 3120 || size.height !== 4500) throw new Error('Expected a 3120 × 4500 PNG cover.');
+    const r = await dialog.showSaveDialog(win, {
+      title: 'Export Cover · 3120 × 4500',
+      defaultPath: path.join(app.getPath('documents'), L.safeName(book.title) + ' - cover.png'),
+      filters: [{ name: 'PNG image', extensions: ['png'] }],
+    });
+    if (r.canceled || !r.filePath) return null;
+    fs.writeFileSync(r.filePath, Buffer.from(png.slice('data:image/png;base64,'.length), 'base64'));
+    shell.showItemInFolder(r.filePath);
+    return r.filePath;
   });
 
   handle('export:run', async ({ format, model, bookId }) => {

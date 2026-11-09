@@ -44,6 +44,7 @@ contextBridge.exposeInMainWorld('amanuensis', {
   confirm: (o) => call('ui:confirm', o),
   openAudio: () => call('ui:openAudio'),
   exportBook: (o) => call('export:run', o),
+  exportCover: (o) => call('cover:export', o),
 
   masteryRead: () => call('mastery:read'),
   masteryAppend: (events) => call('mastery:append', events),

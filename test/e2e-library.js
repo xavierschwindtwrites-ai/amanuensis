@@ -3,7 +3,7 @@
  *   npx electron test/e2e-library.js
  */
 'use strict';
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, dialog, Menu, shell, nativeImage } = require('electron');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -32,6 +32,9 @@ app.whenReady().then(async () => {
   await sleep(2000);
   const js = (c) => win.webContents.executeJavaScript(c);
   const shot = async (n) => fs.writeFileSync(path.join(out, n + '.png'), (await win.webContents.capturePage()).toPNG());
+  let saveTarget = path.join(out, 'cover-export.png'), saveCount = 0, saveOptions;
+  dialog.showSaveDialog = async (_win, options) => { saveCount++; saveOptions = options; return { canceled: !saveTarget, filePath: saveTarget }; };
+  shell.showItemInFolder = () => {};
   try {
     check('every book is a cover on the shelf', (await js(`document.querySelectorAll('#books .book:not(.new-book)').length`)) === titles.length);
     check('covers are painted', (await js(`[...document.querySelectorAll('#books .book:not(.new-book)')].every(b => /url\\("data:image/.test(b.style.background))`)));
@@ -50,9 +53,30 @@ app.whenReady().then(async () => {
     await win.webContents.reload(); await new Promise((r) => win.webContents.once('did-finish-load', r)); await sleep(2000);
     check('the chosen cover survives a relaunch', (await js(`document.querySelector('#books .book').style.background`)) !== bgBefore);
     await shot('shelf-after-new-cover');
+    const bookBeforeExport = fs.readFileSync(path.join(LIB, bookId, 'book.json'), 'utf8');
+    const bgBeforeExport = await js(`document.querySelector('#books .book').style.background`);
+    const popup = Menu.prototype.popup;
+    try {
+      Menu.prototype.popup = function (opts) { this.items.find((item) => item.label === 'Export Cover…').click(); opts.callback(); };
+      await js(`document.querySelector('#books .book').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }))`);
+      for (let i = 0; i < 150 && !fs.existsSync(saveTarget); i++) await sleep(100);
+    } finally { Menu.prototype.popup = popup; }
+    const cover = nativeImage.createFromPath(saveTarget);
+    const size = cover.getSize();
+    check('Export Cover saves a 3120 × 4500 PNG', !cover.isEmpty() && size.width === 3120 && size.height === 4500, JSON.stringify(size));
+    check('cover export uses a named PNG save dialog', saveOptions && saveOptions.defaultPath.endsWith(' - cover.png') && saveOptions.filters[0].extensions[0] === 'png');
+    check('exporting preserves the chosen cover and book metadata', fs.readFileSync(path.join(LIB, bookId, 'book.json'), 'utf8') === bookBeforeExport && (await js(`document.querySelector('#books .book').style.background`)) === bgBeforeExport);
+    check('invalid cover data is rejected before opening a save dialog', await js(`window.amanuensis.exportCover({ bookId: ${JSON.stringify(bookId)}, png: 'data:image/png;base64,AAAA' }).then(() => false, () => true)`) && saveCount === 1);
     check('the wordmark carries the red mark', await js(`!!document.querySelector('.lib-head .wordmark .mark')`));
     check('the shelf counts the books', (await js(`document.querySelector('#lib-count').textContent`)) === titles.length + ' books');
     await js(`document.querySelector('#books .book').click()`); await sleep(1200);
+    const exportMenu = Menu.getApplicationMenu().items.find((item) => item.label === 'File').submenu.items.find((item) => item.label === 'Export');
+    const coverItem = exportMenu.submenu.items.find((item) => item.label === 'Book Cover (.png)…');
+    check('File → Export offers the book cover', !!coverItem);
+    saveTarget = null;
+    coverItem.click();
+    for (let i = 0; i < 150 && saveCount < 2; i++) await sleep(100);
+    check('canceling a cover export returns without writing another PNG', saveCount === 2 && fs.readdirSync(out).filter((f) => f.startsWith('cover-export')).length === 1);
     await js(`(() => { const t = document.querySelector('#text'); t.innerHTML = '<p>The rain had not stopped for three days. Marcus stood at the window and watched the street below, counting the lamps as they came on.</p><p>“Where are you going?” she asked.</p>'; t.dispatchEvent(new Event('input')); })()`);
     await sleep(300);
     await js(`document.body.classList.remove('typing')`);

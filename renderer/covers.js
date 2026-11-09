@@ -552,7 +552,7 @@ const NeoCovers = (() => {
       const spacing = ln.small ? (t.id === 'bebas' ? 3 : t.id === 'cinzel' ? 2.5 : 2) : (t.id === 'band' ? 0.8 : t.id === 'cinzel' ? 0.5 : t.id === 'stack' ? 0.3 : t.id === 'bebas' ? 0.5 : 0);
       try { ctx.letterSpacing = spacing + 'px'; } catch { /* older engines */ }
       // CSS line-height centres the glyphs in the line box; nudge to match
-      ctx.fillText(ln.text, x, y + (lineH(ln) - ln.size) / 2);
+      ctx.fillText(ln.text, x, y + (lineH(ln) - ln.size) / 2, AVAIL_W);
       y += lineH(ln);
     }
     ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
@@ -579,7 +579,7 @@ const NeoCovers = (() => {
       }
       ctx.fillStyle = t.band ? ink : auInk;
       ctx.globalAlpha = t.band ? 0.9 : 0.9;
-      ctx.fillText(author, x, ay);
+      ctx.fillText(author, x, ay, AVAIL_W);
       ctx.globalAlpha = 1;
     }
     ctx.restore();
@@ -588,7 +588,21 @@ const NeoCovers = (() => {
 
   function forget(key) { cache.delete(key); }
 
-  return { plan, dress, paintAbstract, paintInto, renderFull, fitImage, forget, hash, ready, TEMPLATES };
+  async function exportPng(meta) {
+    await ready;
+    const t = TEMPLATES.find((x) => x.id === plan(meta).template);
+    const title = String(meta.title || 'Untitled');
+    // A book opened directly may not have loaded the shelf's author face or extended characters.
+    await Promise.all([
+      document.fonts.load(`${t.weight} 20px "${t.family}"`, t.caps ? title.toUpperCase() : title),
+      document.fonts.load('italic 900 20px "NEO Playfair"', title),
+      document.fonts.load('600 20px "NEO Josefin"', String(meta.author || 'A').toUpperCase()),
+    ]);
+    // Keep the shelf's proportions, repainting art and type at 30× its CSS size.
+    return renderFull(meta, { width: 3120, height: 4500 }).toDataURL('image/png');
+  }
+
+  return { plan, dress, paintAbstract, paintInto, renderFull, exportPng, fitImage, forget, hash, ready, TEMPLATES };
 })();
 
 window.Covers = NeoCovers;

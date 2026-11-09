@@ -104,9 +104,10 @@ function bookTile(b) {
   el.querySelector('.b-refresh').onclick = (e) => { e.stopPropagation(); newCover(b, el); };
   el.oncontextmenu = async (e) => {
     e.preventDefault();
-    const pick = await D.menu([{ id: 'open', label: 'Open' }, { id: 'cover', label: 'New Cover' }, { id: 'reveal', label: 'Show in Finder' }, { type: 'separator' }, { id: 'trash', label: 'Move to Trash…' }]);
+    const pick = await D.menu([{ id: 'open', label: 'Open' }, { id: 'cover', label: 'New Cover' }, { id: 'exportCover', label: 'Export Cover…' }, { id: 'reveal', label: 'Show in Finder' }, { type: 'separator' }, { id: 'trash', label: 'Move to Trash…' }]);
     if (pick === 'open') openBook(b.id);
     if (pick === 'cover') newCover(b, el);
+    if (pick === 'exportCover') exportCover(b);
     if (pick === 'reveal') D.revealBook(b.id);
     if (pick === 'trash' && await D.deleteBook(b.id)) showLibrary();
   };
@@ -123,6 +124,15 @@ async function newCover(b, el) {
     dressCover(el, b);
     setTimeout(() => el.classList.remove('recovering'), 260);
   } catch (e) { toast('Could not change the cover: ' + e.message, true); }
+}
+
+async function exportCover(b = S.book) {
+  if (!b) return toast('Open a book first.');
+  try {
+    const png = await window.Covers.exportPng(coverMeta(b));
+    const out = await D.exportCover({ bookId: b.id, png });
+    if (out) toast('Cover exported.');
+  } catch (e) { toast('Could not export the cover: ' + e.message, true); }
 }
 
 function newBookForm() {
@@ -1564,6 +1574,7 @@ function wire() {
       case 'library': return showLibrary();
       case 'importAudio': return S.book ? importAudio() : toast('Open a book first.');
       case 'export': return exportBook(m.format);
+      case 'exportCover': return exportCover();
       case 'reveal': return S.book && D.revealBook(S.book.id);
       case 'libraryFolder': { const p = await D.chooseLibrary(); if (p) { await window.Mastery?.load(); showLibrary(); } return; }
       case 'find': return S.book && openFind();

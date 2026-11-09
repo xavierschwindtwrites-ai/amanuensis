@@ -93,6 +93,8 @@ Then choose Custom with `http://127.0.0.1:8777/v1`.
 
 Your books appear as covers, each generated from the book (abstract art plus real type for the title and author). Hover a cover and click **↻**, or right-click → New Cover, if you don't like it. The new cover is remembered. The cover generator is adapted from [NEO](https://github.com/hughhowey/neo) by Hugh Howey, used under the MIT License (`licenses/NEO-LICENSE.txt`); its typefaces are under the SIL Open Font License (`renderer/fonts/LICENSE-*.txt`).
 
+To use a generated cover outside the app, right-click it → **Export Cover…**, or open the book and choose **File → Export → Book Cover (.png)…**. Amanuensis redraws the selected art, title and author into a **3120 × 4500 pixel PNG**, ready to use as a temporary cover.
+
 ## Coming back, and keeping going
 
 These features live in `lib/habits.js`, separate from the manuscript pipeline. None of them touch your words.
