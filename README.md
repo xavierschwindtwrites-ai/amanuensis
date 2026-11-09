@@ -1,10 +1,52 @@
+<p align="center"><img src="docs/images/banner.png" alt="Amanuensis: speak your novel, keep every word" width="100%"></p>
+
+<p align="center">
+  <a href="https://github.com/xavierschwindtwrites-ai/amanuensis/releases/latest"><b>Download for macOS (Apple Silicon)</b></a> ·
+  <a href="#bring-your-own-api-key">Bring your own key</a> ·
+  <a href="#the-one-rule">The one rule</a> ·
+  <a href="#run-it">Build from source</a>
+</p>
+
 # Amanuensis
 
 *An amanuensis is the scribe who writes down what an author dictates.*
 
-A dictation-first writing app for novelists. Open a manuscript, press Record (⌘D), and talk. Your words appear on a black page as formatted manuscript prose.
+A dictation-first writing app for novelists. Open a manuscript, press Record (⌘D), and talk. Your words appear on a black page as formatted manuscript prose: quotation marks, paragraphs and punctuation in place, and **never a word you didn't say**.
 
 It's modeled on [NEO](https://github.com/hughhowey/neo): plain files, no accounts, controls that stay hidden until you reach for them.
+
+## A look around
+
+**Your books, as covers.** Every book gets a generated cover; don't like it, ask for another (↻), or export it at 3120 × 4500 as a placeholder cover.
+
+<img src="docs/images/shelf.png" alt="The shelf: six books shown as generated covers" width="100%">
+
+**A black page and your voice.** Press ⌘D and talk. While you dictate, the counts fade away and only the recording controls stay.
+
+<img src="docs/images/recording.png" alt="Dictating into a chapter, with the counts faded and the Stop button lit" width="100%">
+
+**Every word accounted for.** The transcript keeps exactly what you said. AI cleanup may remove *um*s and false starts, and every change is checked word by word. Here the AI tried to add *slowly*, so it was rejected and the clean local version was used instead.
+
+<img src="docs/images/transcript.png" alt="The transcript drawer: verified passages, removed fillers, and one AI edit rejected for adding a word" width="100%">
+
+**A way back in.** When you stop, *Put the Book Away* (⇧⌘J) saves everything and asks for three optional lines: the scene you want to write, a question to find out, and the first thing you'll say. An unfinished sentence is offered as that first move. Next time, it's waiting above the Record button.
+
+<p>
+  <img src="docs/images/put-away.png" alt="Putting the book away: scene, question and first move" width="49%">
+  <img src="docs/images/scene-card.png" alt="The scene card waiting on return" width="49%">
+</p>
+
+**Covers made from your titles**, set in real type by the same engine as NEO.
+
+<img src="docs/images/covers.png" alt="Six generated book covers" width="100%">
+
+## Install
+
+1. Download `Amanuensis-<version>-arm64.dmg` from [Releases](https://github.com/xavierschwindtwrites-ai/amanuensis/releases/latest) and drag Amanuensis to Applications.
+2. The app isn't notarized by Apple yet, so the first time, **right-click it → Open → Open**. (Or run `xattr -dr com.apple.quarantine /Applications/Amanuensis.app`.)
+3. Open Settings (⌘,), add a transcription key, and press ⌘D.
+
+Apple Silicon Macs only for now.
 
 ## Bring your own API key
 
@@ -172,6 +214,10 @@ npm test                         # guard, formatter, audio, habits, Writing Mast
 test/fixtures/make-speech.sh /tmp/speech.wav      # synthesize the dictated test passage
 AMANUENSIS_E2E_WAV=/tmp/speech.wav AMANUENSIS_E2E_STT=http://127.0.0.1:8777/v1 npx electron test/e2e.js
 AMANUENSIS_E2E_WAV=speech.wav AMANUENSIS_E2E_STT=http://127.0.0.1:8777/v1 npx electron test/e2e-mastery.js
+npx electron test/e2e-scene.js      # Put the Book Away and the scene card
+npx electron test/e2e-library.js    # the shelf, covers, cover export, quiet numbers
+npx electron test/e2e-apprentice.js # Training
+npm run screenshots                 # regenerate docs/images from a staged demo library
 ```
 
 The end-to-end test plays real speech into the app's microphone path and drives the UI. It transcribes with the local Whisper server and formats with a mock formatter that tries to slip in an extra word.

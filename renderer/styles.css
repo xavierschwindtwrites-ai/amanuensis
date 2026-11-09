@@ -317,7 +317,7 @@ body.drawer-open #scroller { right: min(420px, 90vw); }
 /* note for next time: a quiet line at the top of the page, gone while dictating */
 #breadcrumb { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 6; max-width: min(34em, 70vw);
   display: flex; gap: 10px; align-items: baseline; padding: 4px 10px; -webkit-app-region: no-drag;
-  font: italic 15px/1.4 var(--serif); color: var(--ui); }
+  font: italic 15px/1.4 var(--serif); color: var(--ui); background: #000; border-radius: 8px; }   /* readable over prose that scrolls beneath */
 #breadcrumb .bc-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #breadcrumb .bc-where { color: var(--ui-dim); font-style: normal; font-size: 12px; cursor: pointer; white-space: nowrap; }
 #breadcrumb .bc-acts { display: flex; gap: 10px; font: 12px var(--sans); opacity: 0; transition: opacity .2s; }
@@ -337,7 +337,8 @@ body.recording #breadcrumb, body.starting #breadcrumb { opacity: 0; pointer-even
 #crumb-edit .dim { font-size: 11px; padding-left: calc(5.5em + 10px); }
 
 /* a scene card: the encounter, the question, the first move, waiting on return */
-#breadcrumb.card { top: auto; bottom: 84px; align-items: flex-start; padding: 10px 16px; max-width: min(36em, 80vw); }   /* waiting by the Record button */
+#breadcrumb.card { top: auto; bottom: 84px; align-items: flex-start; padding: 12px 18px; max-width: min(36em, 80vw);   /* waiting by the Record button */
+  background: #0a0a0a; border: 1px solid #1f1d1a; border-radius: 10px; }
 #breadcrumb.card .bc-text { display: flex; flex-direction: column; gap: 2px; white-space: normal; }
 #breadcrumb.card .bc-line { display: block; }
 #breadcrumb .bc-scene { color: var(--ink); }

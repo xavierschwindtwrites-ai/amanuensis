@@ -1,7 +1,7 @@
 {
   "name": "amanuensis",
   "productName": "Amanuensis",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A dictation-first writing app for novelists. Speak, and your words appear as manuscript prose.",
   "main": "main.js",
   "scripts": {
@@ -11,7 +11,8 @@
     "package": "electron-builder --mac",
     "e2e:mastery": "electron test/e2e-mastery.js",
     "e2e:training": "electron test/e2e-apprentice.js",
-    "icon": "electron tools/make-icon.js"
+    "icon": "electron tools/make-icon.js",
+    "screenshots": "electron tools/screenshots.js"
   },
   "build": {
     "appId": "com.xavierschwindt.amanuensis",
