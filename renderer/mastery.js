@@ -223,7 +223,7 @@
     MS.live = { id, plannedMin, state: 'running', reason: null, runMs: 0, runFrom: Date.now() };
     MS.lastActivity = Date.now();
     lastTickEmit = Date.now();
-    emit({ type: 'sprint', sprint: id, op: 'start', plannedMin, setup: currentSetup() });
+    emit({ type: 'sprint', sprint: id, op: 'start', plannedMin, setup: currentSetup(), ...(opts.landing ? { landing: true } : {}) });
     count(id);
     notify('sprintStart', { id, plannedMin });
     render();
@@ -322,6 +322,7 @@
     const el = $('#sprint'), btn = $('#sprint-btn');
     if (!el) return;
     btn.hidden = !on() || !!MS.live || !!MS.brk;
+    $('#sprint-options').hidden = btn.hidden;
     if (!on()) { el.hidden = true; return; }
     const l = MS.live;
     const n = M.deriveSprints(MS.events).filter((x) => !x.discarded && M.dayKey(x.start, MS.profile.dayStartHour) === today()).length;
@@ -346,6 +347,7 @@
     const items = l
       ? [l.state === 'running' ? { id: 'pause', label: 'Pause Sprint' } : { id: 'resume', label: 'Resume Sprint' }, { id: 'finish', label: 'Finish Sprint' }, { type: 'separator' }, { id: 'discard', label: 'Discard Sprint' }]
       : MS.brk ? [{ id: 'start', label: 'Start Next Sprint' }, { id: 'skip', label: 'Skip Break' }] : [{ id: 'start', label: 'Start Sprint' }];
+    if (!l) items.push({ id: 'landing', label: 'Begin with two minutes' });
     if (MS.extraMenu) items.push({ type: 'separator' }, ...MS.extraMenu.items);
     const pick = await MD.menu(items);
     if (MS.extraMenu && MS.extraMenu.handle(pick)) return;
@@ -354,6 +356,7 @@
     if (pick === 'finish') finish('author');
     if (pick === 'discard') discard();
     if (pick === 'start') start();
+    if (pick === 'landing') start({ plannedMin: M.LANDING_MIN, landing: true });
     if (pick === 'skip') { MS.brk = null; render(); }
   }
 
@@ -504,6 +507,7 @@
 
   $('#sprint').addEventListener('click', sprintMenu);
   $('#sprint-btn').addEventListener('click', () => start());
+  $('#sprint-options').addEventListener('click', sprintMenu);
 
   window.Mastery = {
     load, on, activity, typed, dictationApplied, revised, structure, recording, recordingSettled,

@@ -197,6 +197,44 @@ test('estimate: 1,250 per sprint and a 5,000 target means four sprints, against 
   assert.equal(M.estimate(5000, M.baseline(completed(2, 1250)), p), null, 'no estimate before 3 sprints');
 });
 
+test('a two-minute landing keeps its words and overtime but never calibrates the baseline', () => {
+  const events = [
+    sprintEv('landing', 'start', T0, { plannedMin: M.LANDING_MIN, landing: true }), count('landing', T0, 100),
+    ev({ type: 'typing', book: 'b', added: 900, removed: 0, from: T0 + min(1), to: T0 + min(14), t: T0 + min(14) }),
+    count('landing', T0 + min(15), 1000), sprintEv('landing', 'end', T0 + min(15), { plannedMin: M.LANDING_MIN }),
+  ];
+  const [sprint] = M.deriveSprints(events);
+  const stats = M.sprintStats(sprint, events);
+  assert.equal(sprint.plannedMin, 2);
+  assert.equal(sprint.landing, true);
+  assert.equal(stats.runningSec, 15 * 60, 'overtime is ordinary running time');
+  assert.equal(stats.composed, 900);
+  const day = M.dayStats(events, M.dayKey(T0, 4), 4);
+  assert.equal(day.net, 900, 'a landing contributes to the day');
+  assert.equal(day.sprints, 1);
+  const base = M.baseline([...completed(9, 1250), { sprint, stats }], 30);
+  assert.equal(base.qualifying, 9, 'long overtime does not turn a landing into a calibration sprint');
+  assert.equal(base.calibrated, false);
+  assert.equal(base.sample, 9);
+  assert.equal(base.medianNet, 1250);
+  assert.equal(M.baseline(completed(10, 100, M.LANDING_MIN).map((s) => ({ ...s, sprint: { ...s.sprint, landing: true } }))).qualifying, 0, 'short landings also stay out');
+});
+
+test('a two-minute landing stays open after its planned time, and other short sprints keep their calibration rules', () => {
+  const events = [sprintEv('landing', 'start', T0, { plannedMin: M.LANDING_MIN, landing: true })];
+  const [sprint] = M.deriveSprints(events, { liveId: 'landing', now: T0 + min(3) });
+  assert.equal(sprint.open, true);
+  assert.equal(sprint.landing, true);
+  assert.equal(sprint.end, null);
+  assert.equal(M.sprintStats(sprint, events).runningSec, 3 * 60);
+  const [other] = completed(1, 800, 5);
+  other.stats.runningSec = 15 * 60;
+  assert.equal(M.baseline([other]).qualifying, 1, 'existing short planned sprints still qualify after enough running time');
+  const [normal] = completed(1, 800, 2);
+  normal.stats.runningSec = 15 * 60;
+  assert.equal(M.baseline([normal]).qualifying, 1, 'a normal two-minute sprint is not a landing');
+});
+
 test('nothing in the engine changes a goal', () => {
   const p = M.sanitizeProfile({ goalWords: 1000 });
   const frozen = JSON.stringify(p);

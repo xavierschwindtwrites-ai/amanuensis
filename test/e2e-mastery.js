@@ -4,7 +4,7 @@
  *   AMANUENSIS_E2E_WAV=/path/speech.wav AMANUENSIS_E2E_STT=http://127.0.0.1:8777/v1 npx electron test/e2e-mastery.js
  */
 'use strict';
-const { app, BrowserWindow, dialog } = require('electron');
+const { app, BrowserWindow, dialog, Menu } = require('electron');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -85,6 +85,7 @@ app.whenReady().then(async () => {
     await js(`document.querySelector('#rec').click()`); await sleep(9000);
     check('planned time passes: recording continues', await js(`document.body.classList.contains('recording')`));
     check('planned time passes: sprint counts overtime, does not end', await js(`!!${Mx}._state.live && document.querySelector('#sprint').textContent.includes('+')`), await js(`document.querySelector('#sprint').textContent`));
+    check('the sprint timer recedes with the counts while recording', await js(`document.body.classList.contains('quiet-numbers') && Number(getComputedStyle(document.querySelector('.bar-left')).opacity) < .2`));
     await shot('m1-overtime-while-recording');
     await js(`document.querySelector('#rec').click()`); await waitIdle(); await sleep(500);
     check('stopping dictation does not end the sprint', await js(`!!${Mx}._state.live && ${Mx}._state.live.state === 'running'`));
@@ -182,6 +183,28 @@ app.whenReady().then(async () => {
     const legacyIds = ledgerLines().filter((e) => e.type === 'legacy').map((e) => e.id);
     check('legacy import is idempotent across reloads', legacyIds.length === new Set(legacyIds).size);
 
+    // Choose a landing through the native menu boundary, preserving the ordinary one-click sprint.
+    const popup = Menu.prototype.popup;
+    let landingChoices = [];
+    let menuChoice = 'Skip Break';
+    try {
+      Menu.prototype.popup = function (opts) {
+        landingChoices = this.items.map((item) => item.label);
+        this.items.find((item) => item.label === menuChoice).click();
+        opts.callback();
+      };
+      await js(`document.querySelector('#sprint').click()`); await sleep(200);
+      menuChoice = 'Begin with two minutes';
+      await js(`document.querySelector('#sprint-options').click()`); await sleep(300);
+    } finally { Menu.prototype.popup = popup; }
+    check('Sprint options offers both the normal sprint and a two-minute landing', landingChoices.includes('Start Sprint') && landingChoices.includes('Begin with two minutes'));
+    check('a landing starts at two minutes without changing the usual sprint length', await js(`${Mx}._state.live.plannedMin === 2 && ${Mx}._state.profile.sprintMin === 30`));
+    check('landings are marked explicitly in the sprint ledger', await js(`${Mx}._state.events.find(e => e.type === 'sprint' && e.op === 'start' && e.sprint === ${Mx}._state.live.id).landing === true`));
+    check('starting a landing never opens the microphone', await js(`!window.__amanuensis.S.rec && !document.body.classList.contains('recording')`));
+    await js(`${Mx}._state.live.runFrom -= 121000`); await sleep(1100);
+    check('a landing rolls into overtime without ending', await js(`!!${Mx}._state.live && document.querySelector('#sprint').textContent.includes('+')`));
+    await js(`${Mx}._finish('author')`); await sleep(300);
+
     // Off means off.
     await js(`${Mx}._setProfile({ enabled: false })`); await sleep(300);
     const n0 = ledgerLines().length;
@@ -193,7 +216,7 @@ app.whenReady().then(async () => {
     await js(`${Mx}._persist()`);
     check('turned off: nothing more is recorded', ledgerLines().length === n0, `${n0} -> ${ledgerLines().length}`);
     check('turned off: no signals are computed or stored', !ledgerLines().some((e) => e.seg === 'whileoff'));
-    check('turned off: sprint UI hidden', await js(`document.querySelector('#sprint').hidden && document.querySelector('#sprint-btn').hidden`));
+    check('turned off: sprint UI hidden', await js(`document.querySelector('#sprint').hidden && document.querySelector('#sprint-btn').hidden && document.querySelector('#sprint-options').hidden`));
 
     if (process.env.AMANUENSIS_E2E_KEEP) fs.cpSync(mdir(), path.join(out, 'mastery-copy'), { recursive: true });
     // Delete all data.

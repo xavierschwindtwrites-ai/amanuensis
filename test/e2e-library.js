@@ -67,9 +67,38 @@ app.whenReady().then(async () => {
     await js(`document.body.classList.add('recording'); document.querySelector('#rec').style.setProperty('--lvl', '0.6'); document.querySelector('#rec-time').textContent = '2:14'; document.querySelector('#meter i').style.width = '55%'`);
     await sleep(700);
     await shot('editor-recording');
+
+    // Quiet numbers work without Mastery, and leave controls, errors and manuscript alone.
+    check('quiet numbers default on with Writing Mastery off', await js(`document.body.classList.contains('quiet-numbers') && !window.Mastery.on()`));
+    const manuscript = await js(`window.__amanuensis.serialize()`);
+    win.webContents.sendInputEvent({ type: 'mouseMove', x: 500, y: 200 });
+    await js(`document.querySelector('#text').focus(); document.body.classList.add('typing'); document.querySelector('#status').textContent = 'Test error'; document.querySelector('#status').className = 'err'`);
+    await sleep(450);
+    check('counts recede while composing', await js(`Number(getComputedStyle(document.querySelector('.bar-left')).opacity) < .2`));
+    check('Record, Stop, recording state and errors remain visible while typing', await js(`getComputedStyle(document.querySelector('#bar')).opacity === '1' && getComputedStyle(document.querySelector('#bar')).pointerEvents === 'auto' && getComputedStyle(document.querySelector('#rec')).opacity === '1' && getComputedStyle(document.querySelector('#rec-info')).opacity === '1' && getComputedStyle(document.querySelector('#onair')).opacity === '1' && getComputedStyle(document.querySelector('#status')).opacity === '1'`));
+    win.webContents.sendInputEvent({ type: 'mouseMove', x: 40, y: win.getContentSize()[1] - 25 });
+    await sleep(450);
+    check('hovering the bar reveals counts even during recording', await js(`getComputedStyle(document.querySelector('.bar-left')).opacity === '1'`));
+    win.webContents.debugger.attach('1.3');
+    try {
+      await win.webContents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+      check('reduced motion removes the count fade transition', await js(`getComputedStyle(document.querySelector('.bar-left')).transitionDuration === '0s'`));
+    } finally { win.webContents.debugger.detach(); }
+    check('quiet numbers add nothing to manuscript HTML', (await js(`window.__amanuensis.serialize()`)) === manuscript);
+    await js(`document.querySelector('#status').textContent = ''; document.querySelector('#status').className = 'dim'; document.body.classList.remove('typing')`);
     await js(`document.body.classList.remove('recording')`);
+    win.webContents.sendInputEvent({ type: 'mouseMove', x: 500, y: 200 });
+    await js(`document.body.classList.add('typing')`); await sleep(450);
+    check('typing alone keeps the existing chrome fade', await js(`Number(getComputedStyle(document.querySelector('.bar-left')).opacity) < .2 && getComputedStyle(document.querySelector('#bar')).opacity === '0'`));
+    await js(`document.body.classList.remove('typing')`);
     await js(`window.__amanuensis.S && document.querySelector('#settings-btn').click()`); await sleep(500);
     await shot('settings');
+    await js(`document.querySelector('#st-quiet-numbers').click()`); await sleep(300);
+    check('quiet-number setting turns off immediately', await js(`!document.body.classList.contains('quiet-numbers')`));
+    await js(`document.querySelector('[data-close]').click(); document.querySelector('#text').focus(); document.body.classList.add('typing')`); await sleep(450);
+    check('turning off quiet numbers preserves the existing typing chrome', await js(`getComputedStyle(document.querySelector('.bar-left')).opacity === '1' && getComputedStyle(document.querySelector('#bar')).opacity === '0'`));
+    win.webContents.reload(); await new Promise((r) => win.webContents.once('did-finish-load', r)); await sleep(1500);
+    check('quiet-number setting survives a reload', await js(`!document.body.classList.contains('quiet-numbers') && window.__amanuensis.S.settings.quietNumbers === false`));
   } catch (e) { check('no exceptions', false, e.stack); }
   const failed = results.filter((r) => !r.ok).length;
   console.log(`\n${results.length - failed} passed, ${failed} failed. Output in ${out}`);
