@@ -43,6 +43,7 @@ async function boot() {
   S.settings = await D.settings();
   S.keys = await D.keyStatus();
   applyTextSize();
+  document.body.classList.toggle('quiet-numbers', S.settings.quietNumbers !== false);
   wire();
   updateReady();
   const last = S.settings.lastBook;
@@ -1094,6 +1095,10 @@ async function openSettings() {
     <label class="check"><input type="checkbox" id="st-struct" ${s.structCommands ? 'checked' : ''}> Spoken commands: “new paragraph”, “scene break”, “new chapter”</label>
     <label class="check"><input type="checkbox" id="st-punct" ${s.punctCommands ? 'checked' : ''}> Spoken punctuation: “comma”, “period”, “quote … end quote”</label>
 
+    <h3>Writing</h3>
+    <label class="check"><input type="checkbox" id="st-quiet-numbers" ${s.quietNumbers !== false ? 'checked' : ''}> Fade counts and sprint timer while composing</label>
+    <p class="help">Move to the bottom bar to see them. Recording controls and errors stay visible.</p>
+
     <h3>Sessions</h3>
     <label class="check"><input type="checkbox" id="st-ack" ${s.ackEnabled !== false ? 'checked' : ''}> When you pause, a quiet line saying what the session added</label>
     <label class="check"><input type="checkbox" id="st-notecmd" ${s.noteCommand ? 'checked' : ''}> Voice notes: a passage that starts “note to self” becomes a note, not manuscript</label>
@@ -1147,6 +1152,7 @@ async function openSettings() {
   $('#st-quotes').onchange = (e) => set({ quoteStyle: e.target.value });
   $('#st-struct').onchange = (e) => set({ structCommands: e.target.checked });
   $('#st-punct').onchange = (e) => set({ punctCommands: e.target.checked });
+  $('#st-quiet-numbers').onchange = async (e) => { await set({ quietNumbers: e.target.checked }); document.body.classList.toggle('quiet-numbers', S.settings.quietNumbers !== false); };
   $('#st-ack').onchange = (e) => set({ ackEnabled: e.target.checked });
   $('#st-notecmd').onchange = (e) => set({ noteCommand: e.target.checked });
   $('#st-contact').onchange = (e) => set({ contact: e.target.value });

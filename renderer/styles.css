@@ -340,6 +340,14 @@ body.recording #breadcrumb, body.starting #breadcrumb { opacity: 0; pointer-even
 /* Writing Mastery: as quiet as the word count */
 #sprint { font-variant-numeric: tabular-nums; color: var(--ui); }
 #sprint.over { color: var(--ink-soft); }
+#sprint-options { display: inline-flex; align-items: center; margin-left: -8px; padding: 3px; }
+#sprint-options svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.2; }
+/* Keep Record, recording state and errors present; only the figures recede. */
+body.quiet-numbers.recording.typing #bar { opacity: 1; }
+body.quiet-numbers .bar-left { transition: opacity .35s ease; }
+body.quiet-numbers:is(.typing, .recording) .bar-left { opacity: .12; }
+body.quiet-numbers #bar:hover .bar-left,
+body.quiet-numbers #bar:has(:focus-visible) .bar-left { opacity: 1; }
 #today { position: fixed; top: 40px; left: 50%; transform: translateX(-50%); z-index: 6; font: 12px var(--sans); color: var(--ui-dim); letter-spacing: .02em; pointer-events: none; }
 body.recording #today { opacity: 0; }
 .mtable { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -458,6 +466,7 @@ body:not(.recording):not(.finishing) #rec-info { display: none; }
 @media (prefers-reduced-motion: reduce) {
   #modal:not([hidden]), #modal:not([hidden]) #modal-box, #toast:not([hidden]) { animation: none; }
   #onair, #rec .halo, .book, .chrome { transition: none; }
+  body.quiet-numbers .bar-left { transition: none; }
   body.recording #rec .halo { transform: none; }
 }
 /* red belongs to recording and the mark only */

@@ -24,6 +24,7 @@ const DEFAULTS = {
   level: 1, quoteStyle: 'double', structCommands: true, punctCommands: false,
   micId: '', textSize: 21, contact: '', exportFont: 'times', lastBook: '', lastAuthor: '',
   ackEnabled: true, noteCommand: false,
+  quietNumbers: true,
 };
 const settingsFile = () => path.join(app.getPath('userData'), 'settings.json');
 const keysFile = () => path.join(app.getPath('userData'), 'keys.json');
