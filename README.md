@@ -101,6 +101,10 @@ These features live in `lib/habits.js`, separate from the manuscript pipeline. N
 - **Notes for next time.** Press ⌘J, or click Note, and write what comes next ("Leif confronts Sable about the sword"). The note waits as a quiet line at the top of the page when you return. It hides while you dictate. Hover it to Edit, mark Done, or Delete. Notes are stored in `book.json`, never in chapter text. Optionally, in Settings → Sessions, a passage that *starts* with "note to self" becomes a note instead of manuscript. Its raw transcript stays in the Transcript.
 - **A quiet line at the end of a session.** When you step away (5 minutes after typing, 45 seconds after a recording ends) or leave the book, one line at the bottom says what the session added, e.g. "Chapter Seven grew by 830 words." It needs at least 10 words added, and it disappears when you write again. There are no streaks, scores or dashboards. Sessions are logged in `book.json` and can be turned off in Settings.
 
+## Put the book away
+
+**File → Put the Book Away (⇧⌘J)** saves everything and offers a small card for next time, with three optional lines: the scene you want to write, a question you want to find out, and the first thing you'll say. If you stopped mid-sentence, that unfinished sentence is offered as the first move. Next time you open the book, the card is waiting above the Record button, and it retires itself once a session has written from it. It never stops a recording and never gets in the way of quitting. Cards live in `book.json`, never in your chapters.
+
 ## Writing Mastery (optional, off by default)
 
 Sprints, goals and a private record of your writing sessions. Turn it on in Settings → Writing Mastery. The design and its research are in [`docs/writing-mastery-system.md`](docs/writing-mastery-system.md).

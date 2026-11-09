@@ -53,3 +53,33 @@ test('session summary', () => {
   assert.equal(H.summarize({ a: 100, gone: 900 }, { a: 400 }, names).added, 300, 'deleted chapters do not count against');
   assert.equal(H.summarize({ a: 100 }, { a: 100, b: 50 }, names).message, 'Chapter Eight grew by 50 words.');
 });
+
+test('scene card keeps only what the author wrote', () => {
+  assert.equal(H.sceneCard({ scene: '  ', question: '', move: '' }), null);
+  const c = H.sceneCard({ scene: 'Leif corners Sable  at the bridge', question: 'What makes her hand over the sword?', move: '' });
+  assert.deepEqual(c, { scene: 'Leif corners Sable at the bridge', question: 'What makes her hand over the sword?', text: 'Leif corners Sable at the bridge' });
+  assert.equal(H.sceneCard({ move: 'Start with his accusation.' }).text, 'Start with his accusation.');
+});
+
+test('a lone line stays a plain note; a scene or question makes a card', () => {
+  assert.equal(H.isSceneCard({ text: 'x', move: 'x' }), false);
+  assert.equal(H.isSceneCard({ text: 'x', question: 'y?' }), true);
+  assert.deepEqual(H.cardLines({ text: 'Check the timeline.' }), [{ kind: 'text', text: 'Check the timeline.' }]);
+  assert.deepEqual(H.cardLines({ scene: 'A', move: 'C', text: 'C' }).map((l) => l.kind), ['scene', 'move']);
+});
+
+test('older plain notes open in the editor as the first move', () => {
+  assert.deepEqual(H.cardFields({ text: 'Check the timeline.' }), { scene: '', question: '', move: 'Check the timeline.' });
+  assert.deepEqual(H.cardFields({ scene: 'A', text: 'A' }), { scene: 'A', question: '', move: '' });
+});
+
+test('an unfinished sentence becomes a suggested first move', () => {
+  assert.equal(H.trailingFragment('The door opened. She turned to him and said'), 'She turned to him and said');
+  assert.equal(H.trailingFragment('The door opened.'), '');
+  assert.equal(H.trailingFragment('“Where are you going?” she asked.'), '');
+  assert.equal(H.trailingFragment('“Where are you going?” she asked him'), 'she asked him');
+  assert.equal(H.trailingFragment('It ended. And'), '');
+  assert.equal(H.trailingFragment(''), '');
+  const long = 'One. ' + Array.from({ length: 20 }, (_, i) => 'w' + i).join(' ');
+  assert.ok(H.trailingFragment(long).startsWith('…w6 '));
+});

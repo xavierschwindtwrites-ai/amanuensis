@@ -84,9 +84,12 @@
     </div>
     <div id="today" class="chrome" hidden></div>
     <div id="ex-after" hidden></div>
-    <div id="crumb-edit" hidden>
-      <input id="crumb-input" placeholder="What happens next?" spellcheck="false" autocomplete="off">
-      <span class="dim">Enter to save · Esc to cancel</span>
+    <div id="crumb-edit" hidden role="dialog" aria-labelledby="ce-title">
+      <div id="ce-title">For next time</div>
+      <label class="ce-row"><span>Scene</span><input id="crumb-scene" placeholder="The encounter you want to write" spellcheck="false" autocomplete="off"></label>
+      <label class="ce-row"><span>Question</span><input id="crumb-question" placeholder="Something you want to find out" spellcheck="false" autocomplete="off"></label>
+      <label class="ce-row"><span>First</span><input id="crumb-input" placeholder="What happens next? The first thing you'll say" spellcheck="false" autocomplete="off"></label>
+      <span class="dim">Any line is enough · Enter to save · Esc to cancel</span>
     </div>
 
     <div id="find" hidden>

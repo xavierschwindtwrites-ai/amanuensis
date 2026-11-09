@@ -87,6 +87,7 @@ function buildMenu() {
       { label: 'New Book…', accelerator: 'CmdOrCtrl+Shift+N', click: menuCmd('newBook') },
       { label: 'New Chapter', accelerator: 'CmdOrCtrl+N', click: menuCmd('newChapter') },
       { label: 'Note for Next Time…', accelerator: 'CmdOrCtrl+J', click: menuCmd('note') },
+      { label: 'Put the Book Away…', accelerator: 'CmdOrCtrl+Shift+J', click: menuCmd('putAway') },
       { label: 'Library', accelerator: 'CmdOrCtrl+Shift+L', click: menuCmd('library') },
       { type: 'separator' },
       { label: 'Import Recording…', click: menuCmd('importAudio') },

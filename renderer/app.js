@@ -1358,48 +1358,100 @@ function showBreadcrumb() {
   const where = el.querySelector('.bc-where');
   where.textContent = n.chapterId !== S.ch.id && k >= 0 ? 'Chapter ' + chapterWord(k + 1) + ' · ' : '';
   where.onclick = n.chapterId !== S.ch.id && k >= 0 ? () => openChapter(n.chapterId) : null;
-  el.querySelector('.bc-text').textContent = n.text;
+  const box = el.querySelector('.bc-text');
+  box.textContent = '';
+  const card = H.isSceneCard(n);
+  el.classList.toggle('card', card);
+  if (!card) box.textContent = n.text;
+  else for (const l of H.cardLines(n)) {
+    const s = document.createElement('span');
+    s.className = 'bc-line bc-' + l.kind;
+    s.textContent = l.text;
+    box.appendChild(s);
+  }
   el.hidden = false;
 }
 
+// `text` is a plain line, or a card from H.sceneCard ({scene, question, move, text}).
 function addNote(text, chapterId = S.ch.id) {
   const now = Date.now();
+  const fields = typeof text === 'object' && text ? text : { text };
   S.book.notes = S.book.notes || [];
   // A new note for a chapter supersedes the open one; the old one is kept, marked done.
   for (const n of S.book.notes) if (n.chapterId === chapterId && !n.dismissedAt) n.dismissedAt = now;
-  const note = { id: 'n' + now.toString(36) + Math.random().toString(36).slice(2, 5), chapterId, text, created: now };
+  const note = { id: 'n' + now.toString(36) + Math.random().toString(36).slice(2, 5), chapterId, ...fields, created: now };
   S.book.notes.push(note);
   saveBookMeta();
   showBreadcrumb();
   return note;
 }
 
-function openNoteEditor(note) {
-  const box = $('#crumb-edit'), input = $('#crumb-input');
+const CARD_INPUTS = { scene: '#crumb-scene', question: '#crumb-question', move: '#crumb-input' };
+const cardInput = (f) => $(CARD_INPUTS[f]);
+
+// opts.away: the author is putting the book away; offer an unfinished sentence as the first move.
+function openNoteEditor(note, opts = {}) {
+  const box = $('#crumb-edit');
   S.editingNote = note || null;
-  input.value = note ? note.text : '';
+  S.puttingAway = !!opts.away;
+  const f = H.cardFields(note);
+  if (!note && opts.suggest) f.move = opts.suggest;
+  for (const k of Object.keys(CARD_INPUTS)) cardInput(k).value = f[k];
+  $('#ce-title').textContent = opts.away ? 'Put the book away · leave yourself a way back in' : 'For next time';
   box.hidden = false;
-  setTimeout(() => input.focus(), 0);
+  setTimeout(() => {
+    const first = !note && opts.suggest ? cardInput('move') : ['scene', 'question', 'move'].map(cardInput).find((i) => !i.value) || cardInput('scene');
+    first.focus();
+    if (first === cardInput('move') && opts.suggest) first.select();   // a suggestion: typing replaces it
+  }, 0);
 }
 function closeNoteEditor(refocus = true) {
   $('#crumb-edit').hidden = true;
   S.editingNote = null;
+  const away = S.puttingAway;
+  S.puttingAway = false;
+  if (away) return;
   if (refocus && S.ch && S.ch.at) placeCaretAt(H.resolvePosition(chapterPlain(), S.ch.at));
 }
-$('#crumb-input').addEventListener('keydown', (e) => {
-  e.stopPropagation();
-  if (e.key === 'Escape') { e.preventDefault(); return closeNoteEditor(); }
-  if (e.key !== 'Enter') return;
-  e.preventDefault();
-  const text = e.target.value.replace(/\s+/g, ' ').trim();
+async function saveNoteEditor() {
+  const card = H.sceneCard(Object.fromEntries(Object.keys(CARD_INPUTS).map((k) => [k, cardInput(k).value])));
+  const away = S.puttingAway;
   if (S.editingNote) {
-    if (text) S.editingNote.text = text;
-    else S.book.notes = S.book.notes.filter((n) => n !== S.editingNote);
+    const n = S.editingNote;
+    if (card) { delete n.scene; delete n.question; delete n.move; Object.assign(n, card); }
+    else S.book.notes = S.book.notes.filter((x) => x !== n);
     saveBookMeta(); showBreadcrumb();
-  } else if (text) addNote(text);
+  } else if (card) addNote(card);
   closeNoteEditor();
-});
-$('#crumb-input').addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== $('#crumb-input')) closeNoteEditor(false); }, 150));
+  if (away) await finishPutAway(!!card);
+}
+for (const sel of Object.values(CARD_INPUTS)) {
+  $(sel).addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Escape') { e.preventDefault(); const away = S.puttingAway; closeNoteEditor(); if (away) finishPutAway(false); return; }
+    if (e.key === 'Enter') { e.preventDefault(); saveNoteEditor(); }
+  });
+  $(sel).addEventListener('blur', () => setTimeout(() => {
+    if (!$('#crumb-edit').contains(document.activeElement)) { const away = S.puttingAway; closeNoteEditor(false); if (away) finishPutAway(false); }
+  }, 150));
+}
+
+/* Put the book away: save everything, end the session, leave a way back in. Never stops a
+   recording and never intercepts quitting; "Saved" appears only once the save has landed. */
+async function putAway() {
+  if (!S.book || !S.ch) return;
+  if (S.rec || S.importing) return toast('Stop recording first, then put the book away.');
+  await flushSave();
+  endSession('away');
+  const open = (S.book.notes || []).find((n) => n.chapterId === S.ch.id && !n.dismissedAt) || null;
+  const suggest = open ? '' : H.trailingFragment((() => { const t = chapterPlain(); return t.slice(0, S.ch.at ? H.resolvePosition(t, S.ch.at) : t.length); })());
+  openNoteEditor(open, { away: true, suggest });
+}
+async function finishPutAway(left) {
+  try { await flushSave(); } catch { return; }
+  toast(left ? 'Saved · next move ready' : 'Saved');
+}
+
 $('#breadcrumb').addEventListener('click', (e) => {
   const a = e.target.closest('[data-bc]')?.dataset.bc;
   const n = S.shownNote;
@@ -1450,6 +1502,9 @@ function endSession(reason) {
   if (S.ch) updateCounts();
   const names = Object.fromEntries(S.book.chapters.map((c, k) => [c.id, 'Chapter ' + chapterWord(k + 1)]));
   const sum = H.summarize(s.base, countsNow(), names);
+  // A scene card has done its job once a session wrote from it; it stays in book.json, marked done.
+  const card = S.shownNote;
+  if (sum && reason !== 'quit' && H.isSceneCard(card) && card.created < s.start && !card.dismissedAt) { card.dismissedAt = Date.now(); showBreadcrumb(); }
   if (sum || Date.now() - s.start > 60000) {
     S.book.sessions = S.book.sessions || [];
     S.book.sessions.push({ start: s.start, end: Date.now(), added: sum ? sum.added : 0 });
@@ -1512,6 +1567,7 @@ function wire() {
       case 'toggleRecord': return S.book && toggleRecord();
       case 'transcript': return S.book && ($('#drawer').hidden ? openDrawer() : setDrawer(false));
       case 'note': return S.book && openNoteEditor();
+      case 'putAway': return S.book ? putAway() : toast('Open a book first.');
       case 'sprint': return S.book && window.Mastery?.toggle();
       case 'sprintPause': return window.Mastery?.togglePause();
       case 'progress': return window.Mastery?.openProgress();
@@ -1537,6 +1593,6 @@ function wire() {
   window.addEventListener('beforeunload', () => { autosave.flush(); });
 }
 
-window.__amanuensis = { showAck, retrySeg, switchVersion, rememberPosition, restorePosition, caretOffset, placeCaretAt, chapterPlain, endSession, activity, addNote, showBreadcrumb, S, F, segSpans, serialize, insertBlocks, removeSegment, renderVersion, applyRecord, newRecord, buildLocal, textBefore, placeAnchor, pendingSpan, segFinal, exportBook, flushSave, openChapter, newChapter };
+window.__amanuensis = { putAway, openNoteEditor, showAck, retrySeg, switchVersion, rememberPosition, restorePosition, caretOffset, placeCaretAt, chapterPlain, endSession, activity, addNote, showBreadcrumb, S, F, segSpans, serialize, insertBlocks, removeSegment, renderVersion, applyRecord, newRecord, buildLocal, textBefore, placeAnchor, pendingSpan, segFinal, exportBook, flushSave, openChapter, newChapter };
 
 boot().catch((e) => { console.error(e); toast('Amanuensis could not start: ' + e.message, true, 10000); });
