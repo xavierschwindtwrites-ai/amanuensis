@@ -44,6 +44,7 @@ async function boot() {
   S.keys = await D.keyStatus();
   applyTextSize();
   wire();
+  updateReady();
   const last = S.settings.lastBook;
   const books = await D.listBooks();
   if (last && books.some((b) => b.id === last)) await openBook(last);
@@ -71,6 +72,7 @@ async function showLibrary(books) {
   add.innerHTML = `<div class="cover-slot"><button class="book new-book" id="new-book" title="New book (⇧⌘N)" aria-label="New book">+</button></div><div class="b-meta"><span class="b-name">New book</span></div>`;
   add.querySelector('#new-book').onclick = newBookForm;
   shelf.appendChild(add);
+  $('#lib-count').textContent = books.length ? books.length + (books.length === 1 ? ' book' : ' books') : '';
   const needsKey = !Object.values(S.keys).some(Boolean);
   $('#lib-hint').textContent = !books.length
     ? 'Start a book. Then press Record and talk; your words appear on the page as manuscript prose.'
@@ -262,8 +264,16 @@ async function openChapter(id, opts = {}) {
   showBreadcrumb();
 }
 
+function renderCrumb() {
+  const crumb = $('#crumbbar');
+  if (!crumb || !S.book || !S.ch) return;
+  const k = S.book.chapters.indexOf(S.ch);
+  crumb.innerHTML = `<b>${esc(S.book.title)}</b> · Chapter ${chapterWord(k + 1)}${S.ch.title ? ' — ' + esc(S.ch.title) : ''}`;
+}
+
 function renderChapterHead() {
   const k = S.book.chapters.indexOf(S.ch);
+  renderCrumb();
   $('#ch-num').textContent = 'Chapter ' + chapterWord(k + 1);
   if (titleEl.textContent !== S.ch.title) titleEl.textContent = S.ch.title || '';
 }
@@ -456,6 +466,7 @@ titleEl.addEventListener('input', () => {
   S.ch.title = titleEl.textContent.replace(/\s+/g, ' ').trim();
   const li = $(`#chapters li[data-id="${S.ch.id}"] .tt`);
   if (li) li.textContent = S.ch.title || 'Chapter ' + chapterWord(S.book.chapters.indexOf(S.ch) + 1);
+  renderCrumb();
   saveBookMeta();
 });
 titleEl.addEventListener('keydown', (e) => {
@@ -549,6 +560,7 @@ async function stopRecording() {
 function meter(rms) {
   const w = Math.min(100, Math.sqrt(rms) * 260);
   $('#meter i').style.width = w + '%';
+  $('#rec').style.setProperty('--lvl', Math.min(1, Math.sqrt(rms) * 2.6).toFixed(3));
 }
 
 function providerLabel() {
@@ -1046,7 +1058,7 @@ function modal(html) {
   $('#modal').hidden = false;
   $('#modal-box').querySelectorAll('[data-close]').forEach((b) => (b.onclick = closeModal));
 }
-function closeModal() { $('#modal').hidden = true; $('#modal-box').innerHTML = ''; }
+function closeModal() { $('#modal').hidden = true; $('#modal-box').innerHTML = ''; updateReady(); }
 $('#modal').addEventListener('mousedown', (e) => { if (e.target.id === 'modal') closeModal(); });
 
 async function openSettings() {
@@ -1147,7 +1159,7 @@ async function openSettings() {
     catch (e) { toast(e.message, true); }
   };
   if (book) {
-    $('#st-title').onchange = (e) => { book.title = e.target.value.trim() || 'Untitled'; $('#nav-book').textContent = book.title; saveBookMeta(); };
+    $('#st-title').onchange = (e) => { book.title = e.target.value.trim() || 'Untitled'; $('#nav-book').textContent = book.title; renderCrumb(); saveBookMeta(); };
     $('#st-author').onchange = (e) => { book.author = e.target.value.trim(); saveBookMeta(); };
     $('#st-terms').onchange = (e) => { book.terms = e.target.value; saveBookMeta(); };
   }
@@ -1183,7 +1195,24 @@ function wireKeys(root) {
   });
 }
 
-function updateLevelBtn() { $('#level-btn').textContent = F.LEVELS[S.settings.level] || 'Light'; }
+function updateLevelBtn() { $('#level-btn').textContent = 'Cleanup: ' + (F.LEVELS[S.settings.level] || 'Light'); }
+
+/** Is dictation ready to go? Tells the author before they speak, and takes them to the fix if not. */
+function updateReady() {
+  const el = $('#ready');
+  if (!el || !S.settings) return;
+  const p = S.settings.providers && S.settings.providers[S.settings.provider];
+  const ok = S.settings.provider === 'custom' ? !!S.settings.baseUrl : !!(p && S.keys[p.keyName]);
+  el.classList.toggle('ok', ok); el.classList.toggle('missing', !ok);
+  el.querySelector('span').textContent = ok ? providerLabel() : 'Add a transcription key';
+  el.title = ok ? providerLabel() + ' is ready. Click to change.' : 'Dictation needs a transcription service. Click to set one up.';
+}
+
+async function levelMenu() {
+  const items = F.LEVELS.map((name, k) => ({ id: String(k), label: (k === S.settings.level ? '✓ ' : '    ') + name + ' — ' + F.LEVEL_HELP[k] }));
+  const pick = await D.menu(items);
+  if (pick != null) cycleLevel(+pick);
+}
 async function cycleLevel(l) {
   const level = l ?? ((S.settings.level + 1) % 4);
   S.settings = { ...S.settings, ...(await D.setSettings({ level })) };
@@ -1461,7 +1490,9 @@ function wire() {
   $('#settings-btn').onclick = openSettings;
   $('#transcript-btn').onclick = () => ($('#drawer').hidden ? openDrawer() : setDrawer(false));
   $('#drawer-close').onclick = () => setDrawer(false);
-  $('#level-btn').onclick = () => cycleLevel();
+  $('#level-btn').onclick = () => levelMenu();
+  $('#ready').onclick = () => openSettings();
+  $('#nav-btn').onclick = () => { $('#nav').classList.toggle('pinned'); $('#nav-btn').classList.toggle('on', $('#nav').classList.contains('pinned')); };
   $('#nav-hot').onmouseenter = () => $('#nav').classList.add('open');
 
   D.onMenu(async (m) => {

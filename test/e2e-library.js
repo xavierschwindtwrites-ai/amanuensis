@@ -50,6 +50,26 @@ app.whenReady().then(async () => {
     await win.webContents.reload(); await new Promise((r) => win.webContents.once('did-finish-load', r)); await sleep(2000);
     check('the chosen cover survives a relaunch', (await js(`document.querySelector('#books .book').style.background`)) !== bgBefore);
     await shot('shelf-after-new-cover');
+    check('the wordmark carries the red mark', await js(`!!document.querySelector('.lib-head .wordmark .mark')`));
+    check('the shelf counts the books', (await js(`document.querySelector('#lib-count').textContent`)) === titles.length + ' books');
+    await js(`document.querySelector('#books .book').click()`); await sleep(1200);
+    await js(`(() => { const t = document.querySelector('#text'); t.innerHTML = '<p>The rain had not stopped for three days. Marcus stood at the window and watched the street below, counting the lamps as they came on.</p><p>“Where are you going?” she asked.</p>'; t.dispatchEvent(new Event('input')); })()`);
+    await sleep(300);
+    await js(`document.body.classList.remove('typing')`);
+    check('the breadcrumb names the book and chapter', /Chapter One/.test(await js(`document.querySelector('#crumbbar').textContent`)));
+    check('readiness says what is missing', (await js(`document.querySelector('#ready').textContent`)) === 'Add a transcription key' && (await js(`document.querySelector('#ready').classList.contains('missing')`)));
+    check('cleanup is labelled as cleanup', (await js(`document.querySelector('#level-btn').textContent`)).startsWith('Cleanup: '));
+    check('Chapters is a visible button', await js(`!!document.querySelector('#nav-btn') && document.querySelector('#nav-btn').offsetWidth > 0`));
+    await shot('editor-idle');
+    await js(`document.querySelector('#nav-btn').click()`); await sleep(400);
+    await shot('editor-chapters');
+    await js(`document.querySelector('#nav-btn').click()`);
+    await js(`document.body.classList.add('recording'); document.querySelector('#rec').style.setProperty('--lvl', '0.6'); document.querySelector('#rec-time').textContent = '2:14'; document.querySelector('#meter i').style.width = '55%'`);
+    await sleep(700);
+    await shot('editor-recording');
+    await js(`document.body.classList.remove('recording')`);
+    await js(`window.__amanuensis.S && document.querySelector('#settings-btn').click()`); await sleep(500);
+    await shot('settings');
   } catch (e) { check('no exceptions', false, e.stack); }
   const failed = results.filter((r) => !r.ok).length;
   console.log(`\n${results.length - failed} passed, ${failed} failed. Output in ${out}`);

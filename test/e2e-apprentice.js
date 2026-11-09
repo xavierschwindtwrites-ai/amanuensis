@@ -90,7 +90,8 @@ app.whenReady().then(async () => {
     await js(`document.querySelector('#rec').click()`); await sleep(8000);
     await js(`${Mx}.toggle()`); await sleep(1500);   // finish the sprint while still recording
     check('no question appears during dictation', (await panel()) === '' && (await js(`document.body.classList.contains('recording')`)));
-    await js(`document.querySelector('#rec').click()`); await waitIdle(); await sleep(2500);
+    await js(`document.querySelector('#rec').click()`); await waitIdle();
+    for (let i = 0; i < 30 && !(await panel()); i++) await sleep(500);   // transcription can lag under load
     const p2 = await panel();
     await shot('t4-panel-with-sprint-line');
     check('after dictation stops, the optional question appears', p2.startsWith('One scene, start to finish · done'), p2);

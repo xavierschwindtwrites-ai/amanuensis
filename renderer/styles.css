@@ -374,3 +374,92 @@ body.recording #today { opacity: 0; }
 #ex-after button { color: var(--ui); padding: 2px 4px; }
 #ex-after button:hover { color: var(--ink); }
 #ex-after .ea-x { color: var(--ui-dim); margin-left: 4px; font-size: 15px; }
+
+
+/* =================== brand & chrome polish =================== */
+:root {
+  --red: oklch(0.64 0.19 22);            /* the record light: used only for recording and the mark */
+  --red-soft: oklch(0.64 0.19 22 / 0.18);
+  --ok: oklch(0.74 0.11 150);
+  --warn: oklch(0.78 0.12 75);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);   /* ease-out-quint */
+  --z-chrome: 6; --z-drawer: 7; --z-popover: 9; --z-modal: 20; --z-toast: 30;
+}
+
+/* the mark: the icon's red full stop after the wordmark */
+.wordmark { display: inline-flex; align-items: baseline; }
+.wordmark .mark { width: .26em; height: .26em; border-radius: 50%; background: var(--red); margin-left: .06em;
+  box-shadow: 0 0 0 .14em var(--red-soft); transform: translateY(-.02em); }
+.lib-head .wordmark { font-size: 26px; }
+.lib-tools { display: flex; gap: 22px; align-items: baseline; font-size: 12px; }
+
+/* top bar: where you are, and a visible way to the chapters and the shelf */
+#topbar { position: fixed; top: 0; left: 0; right: 0; height: 44px; z-index: var(--z-chrome); display: grid;
+  grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 16px 0 88px; pointer-events: none; }
+#topbar > * { pointer-events: auto; -webkit-app-region: no-drag; }
+#back { justify-self: end; }
+.tb-btn { display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 9px; border-radius: 6px;
+  color: var(--ui-dim); font-size: 12px; transition: color .15s, background-color .15s; }
+.tb-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; }
+.tb-btn:hover, .tb-btn:focus-visible { color: var(--ink); background: #121212; outline: none; }
+#nav.pinned ~ #topbar #nav-btn, body.nav-open #nav-btn { color: var(--ink); }
+#crumbbar { font: italic 13px var(--serif); color: var(--ui-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 46vw; text-align: center; }
+#crumbbar b { font-weight: 400; color: var(--ui); }
+.corner { display: none; }
+#nav { top: 0; padding-top: 58px; }
+#nav-hot { top: 44px; }
+
+/* on air: a thin red line while the microphone is open */
+#onair { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: var(--z-popover); background: var(--red);
+  transform: scaleX(0); transform-origin: center; opacity: 0; transition: transform .5s var(--ease-out), opacity .3s; pointer-events: none; }
+body.recording #onair { transform: scaleX(1); opacity: 1; box-shadow: 0 0 12px var(--red); }
+
+/* the record button: a halo that breathes with your voice */
+#rec { position: relative; width: 46px; height: 46px; border-color: #34322f; background: #0a0a0a; }
+#rec .halo { position: absolute; inset: -1.5px; border-radius: 50%; border: 1.5px solid var(--red); opacity: 0; transform: scale(1);
+  transition: opacity .3s, transform .08s linear; pointer-events: none; }
+body.recording #rec { animation: none; border-color: transparent; }
+body.recording #rec .halo { opacity: 1; transform: scale(calc(1 + var(--lvl, 0) * .22)); box-shadow: 0 0 calc(var(--lvl, 0) * 18px) var(--red-soft); }
+#rec .dot { box-shadow: 0 0 10px var(--red-soft); }
+#rec-hint { font-size: 11.5px; color: var(--ui-dim); width: 92px; white-space: nowrap; transition: opacity .3s; }
+#rec-hint kbd, kbd { font: 500 10.5px var(--sans); color: var(--ui); border: 1px solid #2a2a2a; border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; margin-left: 3px; }
+body.recording #rec-hint, body.finishing #rec-hint { display: none; }
+body:not(.recording):not(.finishing) #rec-info { display: none; }
+
+/* bottom bar right: state you can act on, then tools */
+.bar-right { gap: 12px; }
+.bar-right .link { font-size: 12.5px; }
+.pill { display: inline-flex; align-items: center; gap: 7px; height: 24px; padding: 0 10px; border-radius: 12px; border: 1px solid #1f1f1f;
+  color: var(--ui); font-size: 12px; transition: border-color .15s, color .15s; white-space: nowrap; }
+.pill:hover, .pill:focus-visible { border-color: #3a3936; color: var(--ink); outline: none; }
+.pill .led { width: 6px; height: 6px; border-radius: 50%; background: var(--ui-dim); }
+#ready.ok .led { background: var(--ok); box-shadow: 0 0 6px oklch(0.74 0.11 150 / .5); }
+#ready.missing { color: var(--warn); border-color: oklch(0.78 0.12 75 / .3); }
+#ready.missing .led { background: var(--warn); }
+#level-btn::after { content: ''; width: 5px; height: 5px; border-right: 1.2px solid currentColor; border-bottom: 1.2px solid currentColor; transform: rotate(45deg) translateY(-2px); margin-left: 2px; opacity: .7; }
+.sep { width: 1px; height: 14px; background: #1f1f1f; }
+#status:empty { display: none; }
+
+/* headings speak in the serif voice */
+#modal h3 { font: italic 400 17px var(--serif); letter-spacing: 0; text-transform: none; color: var(--ink); margin: 30px 0 8px; padding-top: 18px; border-top: 1px solid #161616; }
+#modal h2 + h3, #modal h2 + p + h3 { border-top: 0; padding-top: 0; }
+#modal .ab h3 { border-top: 0; padding-top: 0; margin: 14px 0 6px; font-size: 19px; }
+#modal-box { border-radius: 14px; box-shadow: 0 24px 60px rgba(0,0,0,.6); border-color: #1a1a1a; }
+#modal .btn.primary { background: var(--ink); color: #0a0a0a; font-weight: 500; }
+#modal input[type=checkbox] { accent-color: var(--red); }
+
+/* motion: sheets open, they don't pop */
+#modal:not([hidden]) { animation: veil-in .22s var(--ease-out); }
+#modal:not([hidden]) #modal-box { animation: sheet-in .28s var(--ease-out); }
+@keyframes veil-in { from { background: rgba(0,0,0,0); } }
+@keyframes sheet-in { from { opacity: 0; transform: translateY(8px) scale(.985); } }
+#toast:not([hidden]) { animation: sheet-in .25s var(--ease-out); }
+.book-wrap { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  #modal:not([hidden]), #modal:not([hidden]) #modal-box, #toast:not([hidden]) { animation: none; }
+  #onair, #rec .halo, .book, .chrome { transition: none; }
+  body.recording #rec .halo { transform: none; }
+}
+/* red belongs to recording and the mark only */
+#chapters li.on .n { color: var(--ink); }
+#modal input[type=checkbox] { accent-color: var(--ink); }

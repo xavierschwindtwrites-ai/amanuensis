@@ -12,8 +12,8 @@
   <!-- LIBRARY -->
   <section id="library" class="view">
     <header class="lib-head">
-      <div class="wordmark">Amanuensis</div>
-      <button id="lib-settings" class="link quiet">Settings</button>
+      <div class="wordmark">Amanuensis<span class="mark" aria-hidden="true"></span></div>
+      <div class="lib-tools"><span id="lib-count" class="dim"></span><button id="lib-settings" class="link quiet">Settings</button></div>
     </header>
     <div class="lib-inner">
       <div id="books" class="shelf"></div>
@@ -23,7 +23,12 @@
 
   <!-- EDITOR -->
   <section id="editor" class="view" hidden>
-    <button id="back" class="chrome corner" title="Library (⇧⌘L)">Library</button>
+    <header id="topbar" class="chrome">
+      <button id="nav-btn" class="tb-btn" title="Chapters (⌘\\)" aria-label="Chapters"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg><span>Chapters</span></button>
+      <div id="crumbbar" aria-live="polite"></div>
+      <button id="back" class="tb-btn" title="Library (⇧⌘L)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5v11M6.5 2.5v11M10 3l3 10.2"/></svg><span>Library</span></button>
+    </header>
+    <div id="onair" aria-hidden="true"></div>
 
     <nav id="nav" class="chrome">
       <div class="nav-head"><span id="nav-book"></span></div>
@@ -48,12 +53,15 @@
         <button id="sprint" class="link quiet" hidden title="Sprint (⌥⌘S to start or finish)"></button>
       </div>
       <div class="bar-mid">
-        <button id="rec" title="Record (⌘D)" aria-label="Record"><span class="dot"></span></button>
+        <button id="rec" title="Record (⌘D)" aria-label="Record"><span class="halo"></span><span class="dot"></span></button>
         <div id="rec-info"><span id="rec-time">0:00</span><span id="meter"><i></i></span></div>
+        <div id="rec-hint">Dictate <kbd>⌘D</kbd></div>
       </div>
       <div class="bar-right">
         <span id="status" class="dim"></span>
-        <button id="level-btn" class="link quiet" title="Cleanup level (⌥⌘0–3)"></button>
+        <button id="ready" class="pill" title="Transcription"><i class="led"></i><span></span></button>
+        <button id="level-btn" class="pill" title="How much cleanup the dictation gets (⌥⌘0–3)"></button>
+        <span class="sep" aria-hidden="true"></span>
  <button id="sprint-btn" class="link quiet" hidden title="Start a sprint (⌥⌘S)">Sprint</button>
         <button id="note-btn" class="link quiet" title="Leave a note for next time (⌘J)">Note</button>
         <button id="transcript-btn" class="link quiet" title="Transcript (⇧⌘T)">Transcript</button>
