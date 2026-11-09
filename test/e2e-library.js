@@ -16,8 +16,8 @@ const LIB = path.join(tmp, 'Library');
 fs.writeFileSync(path.join(process.env.AMANUENSIS_USER_DATA, 'settings.json'), JSON.stringify({ libraryPath: LIB }));
 const L = require('../lib/library.js');
 L.setRoot(LIB);
-const titles = [['Cardinal’s War', 'Xavier Schwindt'], ['This Bleeding Light', 'Xavier Schwindt'], ['Memorium', 'Xavier Schwindt'],
-  ['Heavy Lies the Crown', 'Xavier Schwindt'], ['Midwife of the Dead', 'Xavier Schwindt'], ['A Forest Without Trees', 'Xavier Schwindt']];
+const titles = [['The Salt Archive', 'Ada Lindqvist'], ['A Lantern for the Drowned', 'Ada Lindqvist'], ['Ironwood', 'Ada Lindqvist'],
+  ['The Quiet Fleet', 'Ada Lindqvist'], ['Glass Orchard', 'Ada Lindqvist'], ['North of the Last Light', 'Ada Lindqvist']];
 titles.forEach(([title, author], i) => { const b = L.createBook({ title, author }); L.saveBook(b.id, { chapters: [{ ...b.chapters[0], words: 1200 * (i + 1) }] }); });
 
 require('../main.js');

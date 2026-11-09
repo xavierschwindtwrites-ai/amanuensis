@@ -6,6 +6,19 @@ A dictation-first writing app for novelists. Open a manuscript, press Record (‚å
 
 It's modeled on [NEO](https://github.com/hughhowey/neo): plain files, no accounts, controls that stay hidden until you reach for them.
 
+## Bring your own API key
+
+Amanuensis ships with **no API keys and no account**. Dictation and AI formatting use services you choose, with keys you supply:
+
+| What | Services | You need |
+|---|---|---|
+| Transcription (required) | Groq, Deepgram, OpenAI, OpenRouter, or any OpenAI-compatible URL | A key from that service, or a local Whisper server (no key, nothing leaves your Mac) |
+| AI formatting (optional) | OpenRouter, with the model you pick | An OpenRouter key. Without one, Amanuensis formats on your Mac. |
+
+- **Where keys go:** paste them in Settings (‚åò,). They're encrypted with your macOS Keychain and stored in the app's own settings folder, never in your library or in this repository.
+- **Who sees your audio:** it goes straight from your Mac to the service you picked, and nowhere else. There's no Amanuensis server and no telemetry.
+- **Who pays:** usage is billed by each provider to your own account.
+
 ## Run it
 
 ```
@@ -60,7 +73,8 @@ Nothing is lost:
 **Local and private.** `tools/local_whisper_server.py` runs faster-whisper on this Mac, so nothing is uploaded:
 
 ```
-WHISPER_MODEL=large-v3 "../dictation/.venv/bin/python" tools/local_whisper_server.py
+pip install faster-whisper numpy
+WHISPER_MODEL=large-v3 python3 tools/local_whisper_server.py
 ```
 
 Then choose Custom with `http://127.0.0.1:8777/v1`.

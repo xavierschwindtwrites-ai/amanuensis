@@ -46,7 +46,7 @@ app.whenReady().then(async () => {
     await shot('01-library-empty');
     await js(`document.querySelector('#new-book').click()`);
     await sleep(200);
-    await js(`document.querySelector('#nb-title').value = 'The Long Rain'; document.querySelector('#nb-author').value = 'Xavier Schwindt'; document.querySelector('#nb-go').click()`);
+    await js(`document.querySelector('#nb-title').value = 'The Long Rain'; document.querySelector('#nb-author').value = 'Ada Lindqvist'; document.querySelector('#nb-go').click()`);
     await sleep(800);
     check('book opens in the editor', await js(`!document.querySelector('#editor').hidden`));
     await js(`document.querySelector('#ch-title').textContent = 'Rain'; document.querySelector('#ch-title').dispatchEvent(new Event('input'))`);
@@ -195,7 +195,7 @@ app.whenReady().then(async () => {
     const { toDocx, toMarkdown } = require('../lib/export.js');
     const md = toMarkdown({ title: 'T', author: 'A B', words: 10, chapters: [{ heading: 'Chapter 1', paras: [{ runs: [{ t: 'Hi', i: true }] }, { scene: true }] }] });
     check('markdown export', md.includes('*Hi*') && md.includes('* * *'));
-    const docx = await toDocx({ title: 'The Long Rain', author: 'Xavier Schwindt', words: 120, chapters: [{ heading: 'Chapter 1: Rain', paras: [{ runs: [{ t: 'Text' }] }] }] });
+    const docx = await toDocx({ title: 'The Long Rain', author: 'Ada Lindqvist', words: 120, chapters: [{ heading: 'Chapter 1: Rain', paras: [{ runs: [{ t: 'Text' }] }] }] });
     fs.writeFileSync(path.join(out, 'sample.docx'), docx);
     check('docx export builds', docx.length > 2000 && docx.slice(0, 2).toString() === 'PK');
   } catch (e) {
