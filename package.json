@@ -1,0 +1,62 @@
+{
+  "name": "amanuensis",
+  "productName": "Amanuensis",
+  "version": "0.1.0",
+  "description": "A dictation-first writing app for novelists. Speak, and your words appear as manuscript prose.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/",
+    "e2e": "electron test/e2e.js",
+    "package": "electron-builder --mac",
+    "e2e:mastery": "electron test/e2e-mastery.js",
+    "e2e:training": "electron test/e2e-apprentice.js",
+    "icon": "electron tools/make-icon.js"
+  },
+  "build": {
+    "appId": "com.xavierschwindt.amanuensis",
+    "productName": "Amanuensis",
+    "files": [
+      "**/*",
+      "!test/**",
+      "!dist/**",
+      "!*.md",
+      "!docs/**",
+      "!tools/make-icon.js"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "arm64"
+          ]
+        },
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Amanuensis listens to your microphone only while you are recording, to turn your dictation into manuscript text."
+      },
+      "icon": "build/icon.png",
+      "identity": null
+    },
+    "copyright": "\u00a9 2026 Xavier Schwindt"
+  },
+  "author": "Xavier Schwindt",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^43.0.0",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  }
+}
