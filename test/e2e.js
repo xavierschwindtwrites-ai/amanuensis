@@ -41,7 +41,8 @@ app.whenReady().then(async () => {
   if (win.webContents.isLoading()) await new Promise((r) => win.webContents.once('did-finish-load', r));
   await sleep(800);
   const js = (code) => win.webContents.executeJavaScript(code);
-  const shot = async (name) => fs.writeFileSync(path.join(out, name + '.png'), (await win.webContents.capturePage()).toPNG());
+  // Screenshots are for looking at, not assertions: a sleeping display can refuse a capture.
+  const shot = async (name) => { try { fs.writeFileSync(path.join(out, name + '.png'), (await win.webContents.capturePage()).toPNG()); } catch (e) { console.log('(no screenshot ' + name + ': ' + e.message + ')'); } };
   try {
     await shot('01-library-empty');
     await js(`document.querySelector('#new-book').click()`);
