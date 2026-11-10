@@ -12,7 +12,8 @@
     "e2e:mastery": "electron test/e2e-mastery.js",
     "e2e:training": "electron test/e2e-apprentice.js",
     "icon": "electron tools/make-icon.js",
-    "screenshots": "electron tools/screenshots.js"
+    "screenshots": "electron tools/screenshots.js",
+    "site:assets": "electron tools/site-assets.js"
   },
   "build": {
     "appId": "com.xavierschwindt.amanuensis",
