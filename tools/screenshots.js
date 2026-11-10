@@ -87,7 +87,8 @@ app.whenReady().then(async () => {
   await sleep(2500);
   const js = (c) => win.webContents.executeJavaScript(c);
   const calm = () => js(`document.body.classList.remove('typing'); document.activeElement?.blur?.()`);
-  const shot = async (n) => { await sleep(700); fs.writeFileSync(path.join(OUT, n + '.png'), (await win.webContents.capturePage()).toPNG()); console.log('wrote', n); };
+  const shot = async (n) => { await sleep(700); await js(`document.querySelector('#toast')?.setAttribute('hidden', '')`);   // a stray message is not part of the picture
+    fs.writeFileSync(path.join(OUT, n + '.png'), (await win.webContents.capturePage()).toPNG()); console.log('wrote', n); };
   try {
     // The app reopens the last book; the shelf is one click away.
     await js(`window.__amanuensis.S.book ? document.querySelector('#back')?.click() : 0`); await sleep(1200);

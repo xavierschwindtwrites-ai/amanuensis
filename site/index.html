@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Amanuensis: speak your novel, keep every word</title>
+  <meta name="description" content="A dictation-first writing app for novelists on macOS. Talk, and your words land on a black page as finished manuscript prose. The AI that tidies them is never allowed to change a word you said. Free, open source, bring your own key.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Amanuensis: speak your novel, keep every word">
+  <meta property="og:description" content="Dictation-first writing for novelists. Formatting that can never rewrite you. Free and open source for macOS.">
+  <meta property="og:image" content="https://xavierschwindtwrites-ai.github.io/amanuensis/assets/og.png">
+  <meta property="og:url" content="https://xavierschwindtwrites-ai.github.io/amanuensis/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="fonts/source-serif-pro-latin-400-normal.otf" as="font" type="font/otf" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top">
+    <a class="wordmark" href="#" aria-label="Amanuensis, home">Amanuensis<span class="mark" aria-hidden="true"></span></a>
+    <nav aria-label="Primary">
+      <a href="#rule">The one rule</a>
+      <a href="#tour">Tour</a>
+      <a href="#keys">Your keys</a>
+      <a class="gh" href="https://github.com/xavierschwindtwrites-ai/amanuensis">GitHub</a>
+      <a class="btn small" href="https://github.com/xavierschwindtwrites-ai/amanuensis/releases/latest">Download</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- ======================= hero ======================= -->
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Speak your novel.<br><em>Keep every word.</em></h1>
+        <p class="lede">Amanuensis is a writing app for novelists who think out loud. Press record, talk, and your sentences arrive on a black page as finished manuscript prose, with paragraphs, quotation marks and punctuation in place.</p>
+        <div class="ctas">
+          <a class="btn" href="https://github.com/xavierschwindtwrites-ai/amanuensis/releases/latest">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8m0 0 3.2-3.2M8 10 4.8 6.8M3 13h10"/></svg>
+            Download for macOS
+          </a>
+          <a class="btn ghost" href="https://github.com/xavierschwindtwrites-ai/amanuensis">View the source</a>
+        </div>
+        <p class="fine">Free and open source · Apple Silicon · Version 0.2.0</p>
+      </div>
+      <figure class="hero-shot">
+        <div class="window">
+          <div class="chrome-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+          <img src="assets/recording.png" width="1600" height="969" alt="Amanuensis dictating into a chapter: white serif prose on a black page, a red stop button and a running timer at the bottom.">
+        </div>
+      </figure>
+    </section>
+
+    <!-- ======================= the rule ======================= -->
+    <section class="rule" id="rule" aria-labelledby="rule-h">
+      <div class="rule-intro">
+        <h2 id="rule-h">The AI may tidy your words.<br>It may never write them.</h2>
+        <p>Speech is messy. You say “um”, you restart a sentence, you repeat yourself. Amanuensis cleans that up as much or as little as you like. Every change is checked word by word against what you actually said, and anything that adds, swaps or reorders a word is thrown out.</p>
+      </div>
+
+      <div class="demo" data-demo>
+        <div class="demo-head">
+          <span class="said">You said</span>
+          <p class="raw">“Um, he did not, he did not knock. You know, he just stood there.”</p>
+        </div>
+
+        <div class="levels" role="radiogroup" aria-label="Cleanup level">
+          <button role="radio" aria-checked="false" data-level="0">Verbatim</button>
+          <button role="radio" aria-checked="false" data-level="1">Light</button>
+          <button role="radio" aria-checked="true" data-level="2">Moderate</button>
+          <button role="radio" aria-checked="false" data-level="3">Aggressive</button>
+        </div>
+
+        <p class="page" aria-live="polite" data-out></p>
+        <p class="why" data-why></p>
+
+        <div class="reject">
+          <div class="reject-row">
+            <span class="tag warn">AI suggested</span>
+            <p>He <ins>slowly</ins> did not knock.</p>
+          </div>
+          <div class="reject-row">
+            <span class="tag ok">Kept</span>
+            <p>He did not knock.</p>
+          </div>
+          <p class="reject-note">Rejected: it added “slowly”. You never said it, so it never reaches your page. The verified version is used instead, and the original transcript is kept either way.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= tour ======================= -->
+    <section class="tour" id="tour" aria-label="A tour of the app">
+      <article class="feature">
+        <div class="f-copy">
+          <h2>Your books, as covers</h2>
+          <p>Every book gets a cover generated from its title. If you don't like one, ask for another. When a book needs a placeholder, export its cover at 3120 × 4500.</p>
+        </div>
+        <figure class="f-shot wide"><img src="assets/shelf.png" width="1600" height="818" loading="lazy" alt="The library: six novels shown as bold generated covers, each with its word count."></figure>
+      </article>
+
+      <article class="feature flip">
+        <div class="f-copy">
+          <h2>Every word accounted for</h2>
+          <p>The transcript drawer holds exactly what you said, passage by passage. Switch any passage between verbatim, cleaned and AI-formatted versions, or listen to the original audio. Nothing is ever deleted.</p>
+        </div>
+        <figure class="f-shot"><img src="assets/transcript.png" width="1600" height="969" loading="lazy" alt="The transcript drawer beside the manuscript: passages marked verified, fillers listed as removed, and one AI edit rejected for adding a word."></figure>
+      </article>
+
+      <article class="feature">
+        <div class="f-copy">
+          <h2>Leave yourself a way back in</h2>
+          <p>When you stop for the day, <kbd>⇧⌘J</kbd> saves everything and asks for three optional lines: the scene you want to write, a question you want answered, and the first thing you'll say. Tomorrow they're waiting above the Record button.</p>
+        </div>
+        <div class="f-pair">
+          <figure class="f-shot"><img src="assets/put-away.png" width="1600" height="969" loading="lazy" alt="Putting the book away: a card with a scene, a question and a suggested first move."></figure>
+          <figure class="f-shot"><img src="assets/scene-card.png" width="1600" height="969" loading="lazy" alt="Returning to the book: the scene card waits above the Record button."></figure>
+        </div>
+      </article>
+
+      <article class="feature quiet">
+        <div class="f-copy">
+          <h2>Quiet while you compose</h2>
+          <p>Word counts and timers fade while you talk. The page, your voice and a stop button are all that stay. Move to the bar when you want the numbers back. Sprints, goals and progress are there if you want them and off if you don't.</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- ======================= covers strip ======================= -->
+    <section class="covers" aria-label="Generated covers">
+      <img src="assets/covers.png" width="2000" height="506" loading="lazy" alt="Six generated book covers: The Salt Archive, A Lantern for the Drowned, Ironwood, The Quiet Fleet, Glass Orchard, North of the Last Light.">
+    </section>
+
+    <!-- ======================= keys ======================= -->
+    <section class="keys" id="keys" aria-labelledby="keys-h">
+      <h2 id="keys-h">Your keys. Your files. No account.</h2>
+      <p class="keys-lede">Amanuensis ships with no API keys and no server. You choose who transcribes your voice, you pay them directly, and your books stay as plain files on your Mac.</p>
+      <dl class="facts">
+        <div><dt>Transcription</dt><dd>Groq, Deepgram, OpenAI, OpenRouter or any OpenAI-compatible URL. Or run Whisper on your own Mac, and nothing leaves it.</dd></div>
+        <div><dt>AI formatting</dt><dd>Optional, through OpenRouter with the model you pick. Without it, formatting happens on your Mac.</dd></div>
+        <div><dt>Your keys</dt><dd>Encrypted with the macOS Keychain. Never in your library, never sent anywhere but the service they belong to.</dd></div>
+        <div><dt>Your books</dt><dd>Folders of chapters, transcripts and audio. Export to Word, PDF, Markdown or plain text in standard manuscript format.</dd></div>
+      </dl>
+    </section>
+
+    <!-- ======================= install ======================= -->
+    <section class="install" aria-labelledby="install-h">
+      <h2 id="install-h">Start dictating in three steps</h2>
+      <ol class="steps">
+        <li><strong>Download</strong> the latest release and drag Amanuensis to Applications.</li>
+        <li><strong>Right-click → Open</strong> the first time. The app isn't notarized by Apple yet.</li>
+        <li><strong>Add a transcription key</strong> in Settings, open a book and press <kbd>⌘D</kbd>.</li>
+      </ol>
+      <a class="btn" href="https://github.com/xavierschwindtwrites-ai/amanuensis/releases/latest">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8m0 0 3.2-3.2M8 10 4.8 6.8M3 13h10"/></svg>
+        Download Amanuensis
+      </a>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p><span class="wordmark small">Amanuensis<span class="mark" aria-hidden="true"></span></span> <em>The scribe who writes down what an author dictates.</em></p>
+    <p>MIT licensed · by Xavier Schwindt · inspired by <a href="https://github.com/hughhowey/neo">NEO</a> by Hugh Howey · <a href="https://github.com/xavierschwindtwrites-ai/amanuensis">Source on GitHub</a></p>
+  </footer>
+
+  <script>
+  (() => {
+    // The same sentence at each cleanup level. A removed word is shown struck through, never hidden:
+    // that is the promise. Capitalisation of the new first word is the only other change allowed.
+    const LEVELS = [
+      { why: 'Verbatim: punctuation only. Every word you said, in order.',
+        parts: [['Um, he did not, he did not knock. You know, he just stood there.']] },
+      { why: 'Light: fillers like “um” go.',
+        parts: [['Um,', 'x'], [' He did not, he did not knock. You know, he just stood there.']] },
+      { why: 'Moderate: fillers, stutters and false starts go.',
+        parts: [['Um,', 'x'], [' He did not,', 'x'], [' He did not knock.'], [' You know, he just stood there.']] },
+      { why: 'Aggressive: verbal tics like “you know” go too. Still nothing added, nothing reworded.',
+        parts: [['Um,', 'x'], [' He did not,', 'x'], [' He did not knock.'], [' You know,', 'x'], [' He just stood there.']] },
+    ];
+    const root = document.querySelector('[data-demo]');
+    if (!root) return;
+    const out = root.querySelector('[data-out]'), why = root.querySelector('[data-why]');
+    const buttons = [...root.querySelectorAll('[data-level]')];
+    function show(n) {
+      buttons.forEach((b) => b.setAttribute('aria-checked', String(+b.dataset.level === n)));
+      out.textContent = '';
+      for (const [text, cut] of LEVELS[n].parts) {
+        const el = document.createElement(cut ? 'del' : 'span');
+        el.textContent = text;
+        out.appendChild(el);
+      }
+      why.textContent = LEVELS[n].why;
+    }
+    buttons.forEach((b, i) => {
+      b.addEventListener('click', () => show(i));
+      b.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        const j = (i + d + buttons.length) % buttons.length;
+        buttons[j].focus(); show(j);
+      });
+    });
+    buttons.forEach((b) => b.tabIndex = -1);
+    show(2);
+    root.querySelector('[data-level="2"]').tabIndex = 0;
+    root.addEventListener('focusin', () => buttons.forEach((b) => b.tabIndex = b.getAttribute('aria-checked') === 'true' ? 0 : -1));
+  })();
+  </script>
+</body>
+</html>
