@@ -221,3 +221,7 @@ npm run screenshots                 # regenerate docs/images from a staged demo 
 ```
 
 The end-to-end test plays real speech into the app's microphone path and drives the UI. It transcribes with the local Whisper server and formats with a mock formatter that tries to slip in an extra word.
+
+## License
+
+[MIT](LICENSE) © 2026 Xavier Schwindt. The cover generator (from NEO) is MIT-licensed, and the bundled fonts are under the SIL Open Font License; see `LICENSE` for details.
