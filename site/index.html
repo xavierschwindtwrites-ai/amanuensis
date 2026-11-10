@@ -149,9 +149,9 @@
     <section class="install" aria-labelledby="install-h">
       <h2 id="install-h">Start dictating in three steps</h2>
       <ol class="steps">
-        <li><strong>Download</strong> the latest release and drag Amanuensis to Applications.</li>
-        <li><strong>Right-click → Open</strong> the first time. The app isn't notarized by Apple yet.</li>
-        <li><strong>Add a transcription key</strong> in Settings, open a book and press <kbd>⌘D</kbd>.</li>
+        <li><span><strong>Download</strong> the latest release and drag Amanuensis to Applications.</span></li>
+        <li><span><strong>Right-click → Open</strong> the first time. The app isn't notarized by Apple yet.</span></li>
+        <li><span><strong>Add a transcription key</strong> in Settings, open a book and press <kbd>⌘D</kbd>.</span></li>
       </ol>
       <a class="btn" href="https://github.com/xavierschwindtwrites-ai/amanuensis/releases/latest">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8m0 0 3.2-3.2M8 10 4.8 6.8M3 13h10"/></svg>
@@ -184,7 +184,7 @@
     const out = root.querySelector('[data-out]'), why = root.querySelector('[data-why]');
     const buttons = [...root.querySelectorAll('[data-level]')];
     function show(n) {
-      buttons.forEach((b) => b.setAttribute('aria-checked', String(+b.dataset.level === n)));
+      buttons.forEach((b) => { const on = +b.dataset.level === n; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
       out.textContent = '';
       for (const [text, cut] of LEVELS[n].parts) {
         const el = document.createElement(cut ? 'del' : 'span');
@@ -203,10 +203,7 @@
         buttons[j].focus(); show(j);
       });
     });
-    buttons.forEach((b) => b.tabIndex = -1);
     show(2);
-    root.querySelector('[data-level="2"]').tabIndex = 0;
-    root.addEventListener('focusin', () => buttons.forEach((b) => b.tabIndex = b.getAttribute('aria-checked') === 'true' ? 0 : -1));
   })();
   </script>
 </body>
