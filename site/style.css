@@ -94,7 +94,8 @@ main { overflow: clip; }
 .levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; background: #000; border: 1px solid var(--line); border-radius: 999px; }
 .levels button { appearance: none; border: 0; background: transparent; color: var(--muted); font: 500 14px/1 var(--sans); padding: 11px 6px; border-radius: 999px; cursor: pointer; transition: background .25s var(--ease), color .25s var(--ease); }
 .levels button:hover { color: var(--ink); }
-.levels button[aria-checked="true"] { background: var(--raise-2); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.levels button[aria-checked="true"] { background: var(--ink); color: var(--bg); }   /* the selected level reads at a glance (well over 3:1) */
+.levels button[aria-checked="true"]:hover { color: var(--bg); }
 .page { font: 1.5rem/1.55 var(--serif); min-height: 4.65em; }
 .page del { color: oklch(0.62 0.01 80); text-decoration-color: var(--red); text-decoration-thickness: 1.5px; }
 .why { font: 15px/1.5 var(--sans); color: var(--muted); min-height: 3em; }
