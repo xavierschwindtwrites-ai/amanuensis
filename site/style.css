@@ -157,7 +157,8 @@ main { overflow: clip; }
 }
 @media (max-width: 640px) {
   .top nav a:not(.btn) { display: none; }
-  .levels button { font-size: 13px; padding: 10px 2px; }
+  .levels button { font-size: 13px; padding: 10px 2px; min-height: 44px; }
+  .top nav a.btn { min-height: 44px; }
   .reject-row { grid-template-columns: 1fr; gap: 6px; }
   .page { font-size: 1.3rem; }
 }
