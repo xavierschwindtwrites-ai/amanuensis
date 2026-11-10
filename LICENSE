@@ -19,8 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-Third-party parts keep their own licenses: the cover generator in
-renderer/covers.js comes from NEO by Hugh Howey (MIT, licenses/NEO-LICENSE.txt),
-and the fonts in renderer/fonts are under the SIL Open Font License
-(renderer/fonts/LICENSE-*.txt).

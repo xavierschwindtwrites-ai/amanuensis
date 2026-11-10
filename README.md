@@ -224,4 +224,4 @@ The end-to-end test plays real speech into the app's microphone path and drives 
 
 ## License
 
-[MIT](LICENSE) © 2026 Xavier Schwindt. The cover generator (from NEO) is MIT-licensed, and the bundled fonts are under the SIL Open Font License; see `LICENSE` for details.
+[MIT](LICENSE) © 2026 Xavier Schwindt. The cover generator (from NEO) is MIT-licensed, and the bundled fonts are under the SIL Open Font License; see `licenses/NEO-LICENSE.txt` and `renderer/fonts/LICENSE-*.txt`.
