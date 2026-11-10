@@ -96,7 +96,7 @@ main { overflow: clip; }
 .levels button:hover { color: var(--ink); }
 .levels button[aria-checked="true"] { background: var(--raise-2); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
 .page { font: 1.5rem/1.55 var(--serif); min-height: 4.65em; }
-.page del { color: oklch(0.55 0.01 80); text-decoration-color: var(--red); text-decoration-thickness: 1.5px; }
+.page del { color: oklch(0.62 0.01 80); text-decoration-color: var(--red); text-decoration-thickness: 1.5px; }
 .why { font: 15px/1.5 var(--sans); color: var(--muted); min-height: 3em; }
 .reject { border-top: 1px solid var(--line); padding-top: 24px; display: grid; gap: 12px; }
 .reject-row { display: grid; grid-template-columns: 7.5em 1fr; align-items: baseline; gap: 14px; }
