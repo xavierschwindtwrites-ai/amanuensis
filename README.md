@@ -2,6 +2,7 @@
 
 <p align="center">
   <a href="https://github.com/xavierschwindtwrites-ai/amanuensis/releases/latest"><b>Download for macOS (Apple Silicon)</b></a> ·
+  <a href="https://xavierschwindtwrites-ai.github.io/amanuensis/">Website</a> ·
   <a href="#bring-your-own-api-key">Bring your own key</a> ·
   <a href="#the-one-rule">The one rule</a> ·
   <a href="#run-it">Build from source</a>
